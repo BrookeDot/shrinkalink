@@ -78,7 +78,7 @@ if ( ! class_exists( ShrinkALink_Publish::class ) ) {
 		}
 
 		/**
-		 * Only users who may change a post's short link can request a code for it.
+		 * Only users who may change a post's shortlink can request a code for it.
 		 *
 		 * Uses the same shrinkalink_edit_cap filter as the REST routes.
 		 *

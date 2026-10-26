@@ -42,6 +42,7 @@ if ( ! class_exists( ShrinkALink_AdminSettings::class ) ) {
 		public function __construct() {
 			add_action( 'admin_menu', array( $this, 'shrinkalink_settings_page' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+			add_filter( 'option_page_capability_shrinkalink_settings_group', array( $this, 'settings_cap' ) );
 		}
 
 		/**
@@ -54,7 +55,7 @@ if ( ! class_exists( ShrinkALink_AdminSettings::class ) ) {
 			add_options_page(
 				__( 'Shrinkalink Settings', 'shrinkalink' ),
 				__( 'Shrinkalink', 'shrinkalink' ),
-				apply_filters( 'shrinkalink_settings_cap', 'manage_options' ),
+				$this->settings_cap(),
 				'shrinkalink',
 				array( $this, 'shrinkalink_settings_display' )
 			);
@@ -144,6 +145,15 @@ if ( ! class_exists( ShrinkALink_AdminSettings::class ) ) {
 			if ( 'settings_page_shrinkalink' === $hook && ! function_exists( 'wp_get_secret' ) ) {
 				wp_enqueue_script( 'password-toggle' );
 			}
+		}
+
+		/**
+		 * The capability needed to see and save the settings page.
+		 *
+		 * @return string
+		 */
+		public function settings_cap() {
+			return apply_filters( 'shrinkalink_settings_cap', 'manage_options' );
 		}
 	}
 }

@@ -148,7 +148,7 @@ if ( ! class_exists( ShrinkALink_Cron::class ) ) {
 		}
 
 		/**
-		 * Get every post with a short link, with its code, domain and stored clicks.
+		 * Get every post with a shortlink, with its code, domain and stored clicks.
 		 *
 		 * Works through the posts in batches (200 by default, filterable via
 		 * shrinkalink_sync_batch_size), loading each batch's meta in one query.
@@ -164,8 +164,8 @@ if ( ! class_exists( ShrinkALink_Cron::class ) ) {
 				// IDs of posts with a short code, in a stable order so paging can't skip any
 				$post_ids = get_posts(
 					array(
-						'post_type'              => 'any',
-						'post_status'            => 'any',
+						'post_type'              => array_values( ShrinkALink_Post::get_post_types() ),
+						'post_status'            => array_values( ShrinkALink_Post::get_statuses() ),
 						'posts_per_page'         => $batch,
 						'paged'                  => $page,
 						'orderby'                => 'ID',

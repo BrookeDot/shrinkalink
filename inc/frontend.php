@@ -38,9 +38,6 @@ if ( ! class_exists( ShrinkALink_Frontend::class ) ) {
 	class ShrinkALink_Frontend {
 
 		/**
-		 * Hook into the shortlink lookup.
-		 */
-		/**
 		 * Constructor.
 		 */
 		public function __construct() {

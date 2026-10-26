@@ -39,7 +39,7 @@
 					clicks.textContent = response.clicks;
 				}
 
-				// show the short link, built with DOM methods so the URL can't inject markup
+				// show the shortlink, built with DOM methods so the URL can't inject markup
 				const shortCell = row && row.querySelector( '.column-shrinkalink-url' );
 
 				if ( shortCell && response.shortUrl ) {

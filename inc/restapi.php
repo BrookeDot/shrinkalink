@@ -36,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( ShrinkALink_REST_API::class ) ) {
 	/**
-	 * REST routes for reading, creating, refreshing, deleting and blocking a post's short link.
+	 * REST routes for reading, creating, refreshing, deleting and blocking a post's shortlink.
 	 *
 	 * Used by the row actions on the post list screens and the editor panel.
 	 * Loaded in every context, since REST requests are not is_admin().
@@ -67,14 +67,14 @@ if ( ! class_exists( ShrinkALink_REST_API::class ) ) {
 		/**
 		 * Register REST API routes.
 		 *
-		 * GET    /shrinkalink/v1/posts/{id}/link     Get the post's short link details.
-		 * POST   /shrinkalink/v1/posts/{id}/link     Create a short link, or replace it with a custom short code.
+		 * GET    /shrinkalink/v1/posts/{id}/link     Get the post's shortlink details.
+		 * POST   /shrinkalink/v1/posts/{id}/link     Create a shortlink, or replace it with a custom short code.
 		 * DELETE /shrinkalink/v1/posts/{id}/link     Remove the link, and optionally delete it from Shlink.
 		 * POST   /shrinkalink/v1/posts/{id}/refresh  Sync visits, and fix a plain-permalink long URL.
 		 * POST   /shrinkalink/v1/posts/{id}/block    Block or unblock the post from getting a link on save.
 		 * GET    /shrinkalink/v1/posts/{id}/check    Check whether a short code is free on Shlink.
 		 *
-		 * Every route returns the same short link details; see response().
+		 * Every route returns the same shortlink details; see response().
 		 *
 		 * @return void
 		 */
@@ -143,7 +143,6 @@ if ( ! class_exists( ShrinkALink_REST_API::class ) ) {
 				)
 			);
 
-
 			register_rest_route(
 				self::NAMESPACE,
 				'/posts/(?P<id>\d+)/link',
@@ -201,23 +200,22 @@ if ( ! class_exists( ShrinkALink_REST_API::class ) ) {
 					'args'                => $check_args,
 				)
 			);
-
 		}
 
 		/**
-		 * Get a post's current short link details.
+		 * Get a post's current shortlink details.
 		 *
 		 * Doesn't run check_post(), so drafts get an empty shortUrl instead of an error.
 		 *
 		 * @param  WP_REST_Request $request The request.
-		 * @return array                    The post's short link details; see response().
+		 * @return array                    The post's shortlink details; see response().
 		 */
 		public function get_link( WP_REST_Request $request ) {
 			return self::response( $request['id'] );
 		}
 
 		/**
-		 * Create a short link for a post, or replace its current one with a custom short code.
+		 * Create a shortlink for a post, or replace its current one with a custom short code.
 		 *
 		 * Shlink can't rename a short code, so replacing creates a new link. The old
 		 * one keeps working unless replace is set, in which case it is deleted from
@@ -226,7 +224,7 @@ if ( ! class_exists( ShrinkALink_REST_API::class ) ) {
 		 * refresh_link().
 		 *
 		 * @param  WP_REST_Request $request The request.
-		 * @return array|WP_Error           The post's short link details (see response()), plus
+		 * @return array|WP_Error           The post's shortlink details (see response()), plus
 		 *                                  oldDeleted when replace was set, or an error.
 		 */
 		public function create_link( WP_REST_Request $request ) {
@@ -243,7 +241,7 @@ if ( ! class_exists( ShrinkALink_REST_API::class ) ) {
 
 			// one link per post, unless a different short code was asked for
 			if ( false !== $current && ( '' === $requested || $requested === $current ) ) {
-				return new WP_Error( 'shrinkalink_link_exists', __( 'This post already has this short link.', 'shrinkalink' ), array( 'status' => 409 ) );
+				return new WP_Error( 'shrinkalink_link_exists', __( 'This post already has this shortlink.', 'shrinkalink' ), array( 'status' => 409 ) );
 			}
 
 			$args = '' !== $requested ? array( 'customSlug' => $requested ) : array();
@@ -268,13 +266,13 @@ if ( ! class_exists( ShrinkALink_REST_API::class ) ) {
 		}
 
 		/**
-		 * Remove a post's short link, and block it from being recreated on save.
+		 * Remove a post's shortlink, and block it from being recreated on save.
 		 *
 		 * With shlink set, also deletes the link from Shlink first. If that fails
 		 * nothing is changed, so the post never points at a half-deleted link.
 		 *
 		 * @param  WP_REST_Request $request The request.
-		 * @return array|WP_Error           The post's (now empty) short link details, or an error.
+		 * @return array|WP_Error           The post's (now empty) shortlink details, or an error.
 		 */
 		public function delete_link( WP_REST_Request $request ) {
 
@@ -282,7 +280,7 @@ if ( ! class_exists( ShrinkALink_REST_API::class ) ) {
 			$shortcode = ShrinkALink_Post::get_post_meta( $post_id, ShrinkALink_Post::META_SHORTCODE );
 
 			if ( false === $shortcode ) {
-				return new WP_Error( 'shrinkalink_no_link', __( 'This post does not have a short link yet.', 'shrinkalink' ), array( 'status' => 404 ) );
+				return new WP_Error( 'shrinkalink_no_link', __( 'This post does not have a shortlink yet.', 'shrinkalink' ), array( 'status' => 404 ) );
 			}
 
 			if ( $request['shlink'] ) {
@@ -300,13 +298,13 @@ if ( ! class_exists( ShrinkALink_REST_API::class ) ) {
 		}
 
 		/**
-		 * Block or unblock a post from getting a short link when it's saved.
+		 * Block or unblock a post from getting a shortlink when it's saved.
 		 *
 		 * Doesn't touch an existing link; it only affects add_shlink_on_save()
 		 * and wp shrinkalink generate-missing.
 		 *
 		 * @param  WP_REST_Request $request The request.
-		 * @return array                    The post's short link details; see response().
+		 * @return array                    The post's shortlink details; see response().
 		 */
 		public function block_link( WP_REST_Request $request ) {
 
@@ -348,7 +346,7 @@ if ( ! class_exists( ShrinkALink_REST_API::class ) ) {
 
 
 		/**
-		 * Refresh a post's short link from Shlink.
+		 * Refresh a post's shortlink from Shlink.
 		 *
 		 * Copies the visit count into the clicks column, and re-points a link
 		 * created while the post was scheduled (a plain ?p=123 long URL) once the
@@ -356,7 +354,7 @@ if ( ! class_exists( ShrinkALink_REST_API::class ) ) {
 		 * shrinkalink_refresh_visits and shrinkalink_refresh_long_url filters.
 		 *
 		 * @param  WP_REST_Request $request The request.
-		 * @return array|WP_Error           The post's short link details (see response()), or an error.
+		 * @return array|WP_Error           The post's shortlink details (see response()), or an error.
 		 */
 		public function refresh_link( WP_REST_Request $request ) {
 
@@ -364,7 +362,7 @@ if ( ! class_exists( ShrinkALink_REST_API::class ) ) {
 			$shortcode = ShrinkALink_Post::get_post_meta( $post_id, ShrinkALink_Post::META_SHORTCODE );
 
 			if ( false === $shortcode ) {
-				return new WP_Error( 'shrinkalink_no_link', __( 'This post does not have a short link yet.', 'shrinkalink' ), array( 'status' => 404 ) );
+				return new WP_Error( 'shrinkalink_no_link', __( 'This post does not have a shortlink yet.', 'shrinkalink' ), array( 'status' => 404 ) );
 			}
 
 			// look the code up on the domain it was created on
@@ -412,7 +410,7 @@ if ( ! class_exists( ShrinkALink_REST_API::class ) ) {
 			if ( ! in_array( get_post_type( $post_id ), ShrinkALink_Post::get_post_types(), true )
 				|| ! in_array( get_post_status( $post_id ), ShrinkALink_Post::get_statuses(), true )
 			) {
-				return new WP_Error( 'shrinkalink_unsupported_post', __( 'Short links can only be created for published or scheduled posts of a supported type.', 'shrinkalink' ), array( 'status' => 400 ) );
+				return new WP_Error( 'shrinkalink_unsupported_post', __( 'Shortlinks can only be created for published or scheduled posts of a supported type.', 'shrinkalink' ), array( 'status' => 400 ) );
 			}
 
 			return true;
@@ -429,7 +427,7 @@ if ( ! class_exists( ShrinkALink_REST_API::class ) ) {
 		}
 
 		/**
-		 * The response for all routes: the post's current short link details.
+		 * The response for all routes: the post's current shortlink details.
 		 *
 		 * @param  int $post_id The post ID.
 		 * @return array {
@@ -451,7 +449,7 @@ if ( ! class_exists( ShrinkALink_REST_API::class ) ) {
 		}
 
 		/**
-		 * Permission check for reading: only users who can edit the post may see its short link details.
+		 * Permission check for reading: only users who can edit the post may see its shortlink details.
 		 *
 		 * @param  WP_REST_Request $request The request.
 		 * @return bool
@@ -461,7 +459,7 @@ if ( ! class_exists( ShrinkALink_REST_API::class ) ) {
 		}
 
 		/**
-		 * Permission check for changing a post's short link: creating, refreshing, deleting or blocking it.
+		 * Permission check for changing a post's shortlink: creating, refreshing, deleting or blocking it.
 		 *
 		 * Defaults to edit_post; change it with the shrinkalink_edit_cap filter.
 		 *
