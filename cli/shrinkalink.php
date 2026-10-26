@@ -499,6 +499,29 @@ if ( ! class_exists( ShrinkALink_Commands::class ) ) {
 		}
 
 		/**
+		 * Read --dry-run, stopping on anything that isn't clearly true or false
+		 *
+		 * WP-CLI doesn't enforce the options listed in the docblock, so a typo
+		 * like --dry-run=flase reaches the command as-is.
+		 *
+		 * @param  array $assoc_args The command's options.
+		 * @return bool              True for a dry run, which is the default.
+		 */
+		private static function is_dry_run( $assoc_args ) {
+
+			$value = $assoc_args['dry-run'] ?? true;
+
+			// a typo, or an empty --dry-run=, must never turn the dry run off
+			$dry_run = '' === $value ? null : filter_var( $value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE );
+
+			if ( null === $dry_run ) {
+				WP_CLI::error( 'Use --dry-run=true to preview, or --dry-run=false to make changes.' );
+			}
+
+			return $dry_run;
+		}
+
+		/**
 		 * Tag existing short URLs with the host of their long URL.
 		 *
 		 * A one-off backfill for links created before tagging. Covers every
@@ -531,9 +554,8 @@ if ( ! class_exists( ShrinkALink_Commands::class ) ) {
 		 */
 		public function tag_links( $args, $assoc_args ) {
 
-			$only = $assoc_args['host'] ?? '';
-			// --dry-run=false arrives as the string "false", so convert it to a real boolean
-			$dry_run = filter_var( $assoc_args['dry-run'] ?? true, FILTER_VALIDATE_BOOLEAN );
+			$only    = $assoc_args['host'] ?? '';
+			$dry_run = self::is_dry_run( $assoc_args );
 
 			$links = ShrinkALink_API::list_shlinks();
 
@@ -613,7 +635,7 @@ if ( ! class_exists( ShrinkALink_Commands::class ) ) {
 		 */
 		public function generate_missing( $args, $assoc_args ) {
 
-			$dry_run = filter_var( $assoc_args['dry-run'] ?? true, FILTER_VALIDATE_BOOLEAN );
+			$dry_run = self::is_dry_run( $assoc_args );
 			$limit   = absint( $assoc_args['limit'] ?? 0 );
 			$types   = isset( $assoc_args['post_type'] ) ? array( $assoc_args['post_type'] ) : array_values( ShrinkALink_Post::get_post_types() );
 

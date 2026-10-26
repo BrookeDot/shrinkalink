@@ -1,9 +1,22 @@
 {
+  "name": "brookedot/shrinkalink",
+  "description": "Create Shlink shortlinks for your posts automatically, and use them as your site's shortlinks.",
+  "type": "wordpress-plugin",
+  "license": "GPL-3.0-or-later",
+  "require": {
+    "php": ">=8.4",
+    "composer/installers": "^2.0"
+  },
   "require-dev": {
     "wp-cli/i18n-command": "^2",
     "phpunit/phpunit": "^9.6",
     "yoast/phpunit-polyfills": "^4.0",
     "wp-phpunit/wp-phpunit": "^7.1"
+  },
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true
+    }
   },
   "scripts": {
     "makepot": "wp i18n make-pot ."

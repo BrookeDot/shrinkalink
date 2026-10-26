@@ -4,7 +4,7 @@ Tags: shlink, shortlinks
 Requires at least: 7.1
 Tested up to: 7.2
 Requires PHP: 8.4
-Stable tag: 0.1.0
+Stable tag: 0.1.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -203,3 +203,7 @@ Arguments: `$post_id` (int), `$shorturl` (string).
 
 = 0.1.0 =
 * Initial release.
+
+= 0.1.1 = 
+* Fix: `wp shrinkalink tag-links` and `generate-missing` now stop with an error when `--dry-run` isn't true or false, instead of making changes.
+* Add: Install the plugin with Composer.
