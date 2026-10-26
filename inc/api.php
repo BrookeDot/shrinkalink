@@ -187,7 +187,7 @@ if ( ! class_exists( ShrinkALink_API::class ) ) {
 			// optional pattern for sites that want a stricter character set
 			$pattern = apply_filters( 'shrinkalink_keyword_pattern', '' );
 
-			return ! empty( $pattern ) ? preg_replace( $pattern, '', $string ) : $string;
+			return ! empty( $pattern ) ? (string) preg_replace( $pattern, '', $string ) : (string) $string;
 		}
 
 		/**
@@ -199,9 +199,9 @@ if ( ! class_exists( ShrinkALink_API::class ) ) {
 		 */
 		public static function get_shlink( $shortcode = '', $args = array() ) {
 
-			// bail without a shortcode to look up
+			// bail without a short code to look up
 			if ( empty( $shortcode ) ) {
-				return new WP_Error( 'shrinkalink_no_shortcode', __( 'No shortcode provided.', 'shrinkalink' ) );
+				return new WP_Error( 'shrinkalink_no_shortcode', __( 'No short code provided.', 'shrinkalink' ) );
 			}
 
 			$data = self::request( 'GET', self::short_url_path( $shortcode, $args ) );
@@ -230,9 +230,9 @@ if ( ! class_exists( ShrinkALink_API::class ) ) {
 		 */
 		public static function update_shlink( $shortcode = '', $fields = array(), $args = array() ) {
 
-			// bail without a shortcode to update
+			// bail without a short code to update
 			if ( empty( $shortcode ) ) {
-				return new WP_Error( 'shrinkalink_no_shortcode', __( 'No shortcode provided.', 'shrinkalink' ) );
+				return new WP_Error( 'shrinkalink_no_shortcode', __( 'No short code provided.', 'shrinkalink' ) );
 			}
 
 			// bail without anything to change
@@ -252,7 +252,7 @@ if ( ! class_exists( ShrinkALink_API::class ) ) {
 				return new WP_Error( 'shrinkalink_api_error', __( 'Shlink did not return a short URL.', 'shrinkalink' ), $data );
 			}
 
-			return $data['shortUrl'];
+			return $data;
 		}
 
 		/**
@@ -264,9 +264,9 @@ if ( ! class_exists( ShrinkALink_API::class ) ) {
 		 */
 		public static function delete_shlink( $shortcode = '', $args = array() ) {
 
-			// bail without a shortcode to delete
+			// bail without a short code to delete
 			if ( empty( $shortcode ) ) {
-				return new WP_Error( 'shrinkalink_no_shortcode', __( 'No shortcode provided.', 'shrinkalink' ) );
+				return new WP_Error( 'shrinkalink_no_shortcode', __( 'No short code provided.', 'shrinkalink' ) );
 			}
 
 			$data = self::request( 'DELETE', self::short_url_path( $shortcode, $args ) );

@@ -2,7 +2,7 @@
 /**
  * Shrinkalink Link Creator - Admin Columns Module
  *
- * Adds the clicks column and short link row actions to post list screens
+ * Adds the clicks column and shortlink row actions to post list screens
  *
  * @package Shrinkalink
  */
@@ -94,7 +94,7 @@ if ( ! class_exists( ShrinkALink_AdminColumns::class ) ) {
 			add_action( "manage_{$post_type}_posts_custom_column", array( $this, 'display_columns' ), 10, 2 );
 		}
 		/**
-		 * Add the short link and clicks columns.
+		 * Add the shortlink and clicks columns.
 		 *
 		 * Either can be turned off with the shrinkalink_show_url_column or
 		 * shrinkalink_show_clicks_column filter, which also get the post type.
@@ -125,7 +125,7 @@ if ( ! class_exists( ShrinkALink_AdminColumns::class ) ) {
 
 
 		/**
-		 * Output the short link and click count columns.
+		 * Output the shortlink and click count columns.
 		 *
 		 * The click count is the one stored on the post, which Refresh Shlink updates from Shlink.
 		 *
@@ -137,7 +137,6 @@ if ( ! class_exists( ShrinkALink_AdminColumns::class ) ) {
 
 			// start my column output
 			switch ( $column ) {
-
 				case 'shrinkalink-url':
 					$url = ShrinkALink_Post::get_post_meta( $post_id, ShrinkALink_Post::META_URL );
 
@@ -151,7 +150,7 @@ if ( ! class_exists( ShrinkALink_AdminColumns::class ) ) {
 					break;
 
 				case 'shrinkalink-clicks':
-					echo '<span>' . ShrinkALink_Post::get_post_meta( $post_id, ShrinkALink_Post::META_CLICKS, '0' ) . '</span>';
+					echo '<span>' . absint( ShrinkALink_Post::get_post_meta( $post_id, ShrinkALink_Post::META_CLICKS, '0' ) ) . '</span>';
 
 					break;
 
@@ -161,7 +160,7 @@ if ( ! class_exists( ShrinkALink_AdminColumns::class ) ) {
 		/**
 		 * Add a Create Shlink or Refresh Shlink link to the row actions.
 		 *
-		 * Create for published or scheduled posts without a short link, Refresh for
+		 * Create for published or scheduled posts without a shortlink, Refresh for
 		 * posts that have one. Hooked to both post_row_actions and page_row_actions,
 		 * so it covers hierarchical and non-hierarchical post types.
 		 *
@@ -172,12 +171,12 @@ if ( ! class_exists( ShrinkALink_AdminColumns::class ) ) {
 		public function row_action( $actions, $post ) {
 
 			// make sure we're working with an approved post type
-			if ( ! in_array( $post->post_type, ShrinkALink_Post::get_post_types() ) ) {
+			if ( ! in_array( $post->post_type, ShrinkALink_Post::get_post_types(), true ) ) {
 				return $actions;
 			}
 
 			// bail if we aren't working with a published or scheduled post
-			if ( ! in_array( get_post_status( $post->ID ), ShrinkALink_Post::get_statuses() ) ) {
+			if ( ! in_array( get_post_status( $post->ID ), ShrinkALink_Post::get_statuses(), true ) ) {
 				return $actions;
 			}
 

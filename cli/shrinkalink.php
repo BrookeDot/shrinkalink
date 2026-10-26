@@ -120,9 +120,9 @@ if ( ! class_exists( ShrinkALink_Commands::class ) ) {
 		public function set_key( $args, $assoc_args ) {
 
 			// piped in, or typed at a hidden prompt
-			$key = posix_isatty( STDIN )
-				? \cli\prompt( 'Shlink API key', false, ': ', true )
-				: trim( file_get_contents( 'php://stdin' ) );
+			$key = function_exists( 'posix_isatty' ) && posix_isatty( STDIN )
+			? \cli\prompt( 'Shlink API key', false, ': ', true )
+			: trim( file_get_contents( 'php://stdin' ) );
 
 			if ( '' === trim( (string) $key ) ) {
 				WP_CLI::error( 'No API key provided.' );
@@ -180,7 +180,7 @@ if ( ! class_exists( ShrinkALink_Commands::class ) ) {
 			if ( is_wp_error( $configured ) ) {
 				WP_CLI::warning( $configured->get_error_message() );
 			} else {
-				WP_CLI::success( 'Ready to create short links.' );
+				WP_CLI::success( 'Ready to create shortlinks.' );
 			}
 		}
 

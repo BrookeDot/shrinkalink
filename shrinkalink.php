@@ -10,6 +10,8 @@
  * Version:         0.1.0
  * Requires at least: 7.1
  * Requires PHP:    8.4
+ * License:         GPLv3 or later
+ * License URI:     https://www.gnu.org/licenses/gpl-3.0.html
  *
  * @package         Shrinkalink
  */
@@ -33,8 +35,6 @@
  */
 
 namespace BrookeDot\Shrinkalink;
-
-use WP_CLI;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -62,7 +62,7 @@ class ShrinkALink {
 	 *
 	 * @var ShrinkALink|false
 	 */
-	static $instance = false;
+	private static $instance = false;
 
 	/**
 	 * Hook text domain and file loading into plugins_loaded.
@@ -111,7 +111,6 @@ class ShrinkALink {
 		// Load our front end.
 		if ( ! is_admin() ) {
 			require_once SHRINKALINK_DIR . 'inc/frontend.php';
-
 		}
 
 		if ( class_exists( 'WP_CLI' ) ) {
@@ -137,10 +136,6 @@ class ShrinkALink {
 }
 
 
-
-// Instantiate our class.
-$Shrinkalink = ShrinkALink::getInstance();
-
 // clear the click sync event when the plugin is deactivated
 register_deactivation_hook(
 	__FILE__,
@@ -149,3 +144,6 @@ register_deactivation_hook(
 		ShrinkALink_Cron::unschedule();
 	}
 );
+
+// Instantiate our class.
+ShrinkALink::getInstance();

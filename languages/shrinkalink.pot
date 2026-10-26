@@ -1,0 +1,299 @@
+# Copyright (C) 2026 Brooke.
+# This file is distributed under the same license as the Shrinkalink plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: Shrinkalink 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/shrinkalink\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-10-26T20:42:59+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 3.0.0-alpha-836ccac\n"
+"X-Domain: shrinkalink\n"
+
+#. Plugin Name of the plugin
+#: shrinkalink.php:3
+#: inc/admin/admin-settings.php:56
+#: js/admin-metabox.js:192
+msgid "Shrinkalink"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: shrinkalink.php:4
+msgid "https://brooke.codes/shrinkalink"
+msgstr ""
+
+#. Description of the plugin
+#: shrinkalink.php:5
+msgid "Adds basic Shlink support for WordPress"
+msgstr ""
+
+#. Author of the plugin
+#: shrinkalink.php:6
+msgid "Brooke."
+msgstr ""
+
+#. Author URI of the plugin
+#: shrinkalink.php:7
+msgid "https://broo.ke"
+msgstr ""
+
+#: inc/admin/admin-columns.php:111
+msgid "Shortlink"
+msgstr ""
+
+#: inc/admin/admin-columns.php:116
+msgid "Shortlink clicks"
+msgstr ""
+
+#: inc/admin/admin-columns.php:145
+msgid "No shortlink"
+msgstr ""
+
+#: inc/admin/admin-columns.php:185
+msgid "Create Shlink"
+msgstr ""
+
+#: inc/admin/admin-columns.php:187
+#: js/admin-columns.js:58
+msgid "Refresh Shlink"
+msgstr ""
+
+#: inc/admin/admin-settings.php:55
+#: inc/admin/admin-settings.php:80
+msgid "Shrinkalink Settings"
+msgstr ""
+
+#: inc/admin/admin-settings.php:86
+msgid "Shlink Install URL"
+msgstr ""
+
+#: inc/admin/admin-settings.php:88
+msgid "https://example.com"
+msgstr ""
+
+#: inc/admin/admin-settings.php:90
+msgid "The base URL for your Shlink install. Must use https."
+msgstr ""
+
+#: inc/admin/admin-settings.php:95
+#: inc/admin/admin-settings.php:106
+msgid "Shlink API Key"
+msgstr ""
+
+#: inc/admin/admin-settings.php:106
+msgid "Key saved to secrets"
+msgstr ""
+
+#: inc/admin/admin-settings.php:118
+msgid "API key saved to WordPress Secrets. Leave blank to keep it, or enter a new key to replace it."
+msgstr ""
+
+#: inc/admin/admin-settings.php:120
+msgid "The API key for your Shlink install."
+msgstr ""
+
+#: inc/api.php:125
+msgid "No URL provided."
+msgstr ""
+
+#: inc/api.php:133
+#: inc/restapi.php:332
+msgid "The short code is empty after removing invalid characters."
+msgstr ""
+
+#: inc/api.php:165
+#: inc/api.php:216
+#: inc/api.php:252
+msgid "Shlink did not return a short URL."
+msgstr ""
+
+#: inc/api.php:204
+#: inc/api.php:235
+#: inc/api.php:269
+msgid "No short code provided."
+msgstr ""
+
+#: inc/api.php:240
+msgid "No fields provided to update."
+msgstr ""
+
+#: inc/api.php:350
+msgid "Unknown Shlink error."
+msgstr ""
+
+#: inc/api.php:373
+msgid "No Shlink URL to check."
+msgstr ""
+
+#: inc/api.php:393
+msgid "That URL did not respond like a Shlink server."
+msgstr ""
+
+#: inc/api.php:398
+msgid "Shlink reported that it is not healthy."
+msgstr ""
+
+#: inc/restapi.php:86
+msgid "The post ID."
+msgstr ""
+
+#: inc/restapi.php:98
+msgid "A custom short code for the new link."
+msgstr ""
+
+#: inc/restapi.php:103
+msgid "Delete the current link from Shlink once the new one is saved."
+msgstr ""
+
+#: inc/restapi.php:115
+msgid "Also delete the link from Shlink."
+msgstr ""
+
+#: inc/restapi.php:127
+msgid "True to stop a link being created on save, false to allow it."
+msgstr ""
+
+#: inc/restapi.php:139
+msgid "The short code to check."
+msgstr ""
+
+#: inc/restapi.php:244
+msgid "This post already has this shortlink."
+msgstr ""
+
+#: inc/restapi.php:283
+#: inc/restapi.php:365
+msgid "This post does not have a shortlink yet."
+msgstr ""
+
+#: inc/restapi.php:407
+msgid "Post not found."
+msgstr ""
+
+#: inc/restapi.php:413
+msgid "Shortlinks can only be created for published or scheduled posts of a supported type."
+msgstr ""
+
+#: inc/settings.php:93
+msgid "The previous URL was kept."
+msgstr ""
+
+#: inc/settings.php:197
+msgid "Shlink URL"
+msgstr ""
+
+#: inc/settings.php:201
+msgid "API key"
+msgstr ""
+
+#. translators: %s: comma-separated list of missing settings
+#: inc/settings.php:212
+#, php-format
+msgid "Shrinkalink is missing settings: %s."
+msgstr ""
+
+#: inc/settings.php:260
+msgid "The Shlink URL must be a valid https URL, like https://example.com."
+msgstr ""
+
+#: inc/settings.php:265
+msgid "The Shlink URL should not include a query string or #fragment."
+msgstr ""
+
+#: js/admin-columns.js:27
+msgid "Working…"
+msgstr ""
+
+#: js/admin-columns.js:64
+msgid "Something went wrong."
+msgstr ""
+
+#. translators: %s: the requested short code
+#: js/admin-metabox.js:76
+#, js-format
+msgid "The short code \"%s\" is already in use, so it was cleared."
+msgstr ""
+
+#: js/admin-metabox.js:101
+msgid "New link saved, but the old link could not be deleted from Shlink."
+msgstr ""
+
+#: js/admin-metabox.js:181
+msgid "Already in use. Try another short code."
+msgstr ""
+
+#: js/admin-metabox.js:183
+msgid "Available, and will be saved as: "
+msgstr ""
+
+#: js/admin-metabox.js:185
+msgid "Available."
+msgstr ""
+
+#: js/admin-metabox.js:202
+msgid "Delete shortlink"
+msgstr ""
+
+#: js/admin-metabox.js:213
+msgid "Shortlink deleted. A new one won't be created on save; add a short code below to create one."
+msgstr ""
+
+#: js/admin-metabox.js:214
+msgid "No shortlink yet. One is created when the post is published."
+msgstr ""
+
+#: js/admin-metabox.js:226
+msgid "Delete"
+msgstr ""
+
+#: js/admin-metabox.js:231
+msgid "Remove this shortlink from the post?"
+msgstr ""
+
+#: js/admin-metabox.js:239
+msgid "Manually deleted shortlinks won't be recreated on save. A new short code must be added manually."
+msgstr ""
+
+#: js/admin-metabox.js:242
+msgid "Also delete from Shlink"
+msgstr ""
+
+#: js/admin-metabox.js:243
+msgid "If deleted from Shlink, the link stops working everywhere. This can't be undone."
+msgstr ""
+
+#: js/admin-metabox.js:255
+msgid "Short code"
+msgstr ""
+
+#: js/admin-metabox.js:267
+msgid "Saved with the post, and used for its shortlink when it's published."
+msgstr ""
+
+#: js/admin-metabox.js:273
+msgid "Check availability before using to prevent conflicts. If a conflict occurs, this field will be cleared and a random short code will be used on publish."
+msgstr ""
+
+#: js/admin-metabox.js:292
+msgid "Delete current link"
+msgstr ""
+
+#: js/admin-metabox.js:293
+msgid "Removes the current shortlink in addition to creating a new link with the updated short code."
+msgstr ""
+
+#: js/admin-metabox.js:317
+msgid "Check availability"
+msgstr ""
+
+#: js/admin-metabox.js:328
+msgid "Update shortlink"
+msgstr ""
+
+#: js/admin-metabox.js:329
+msgid "Create shortlink"
+msgstr ""

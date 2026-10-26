@@ -34,7 +34,7 @@ if ( ! class_exists( ShrinkALink_AdminMetabox::class ) ) {
 	/**
 	 * The Shrinkalink panel in the block editor's post sidebar.
 	 *
-	 * The panel (js/admin-metabox.js) reads and changes the short link through
+	 * The panel (js/admin-metabox.js) reads and changes the shortlink through
 	 * the routes in ShrinkALink_REST_API, so no post meta is exposed to core REST.
 	 */
 	class ShrinkALink_AdminMetabox {
@@ -70,7 +70,8 @@ if ( ! class_exists( ShrinkALink_AdminMetabox::class ) ) {
 				SHRINKALINK_VER,
 				true
 			);
-	wp_add_inline_script(
+
+			wp_add_inline_script(
 				'shrinkalink-admin-metabox',
 				'window.shrinkalinkSettings = ' . wp_json_encode( array( 'statuses' => array_values( ShrinkALink_Post::get_statuses() ) ) ) . ';',
 				'before'

@@ -210,7 +210,7 @@
 						"p",
 						null,
 						blocked
-							? __("Shortlink deleted. A new one won't be created on save; add a shortcode below to create one.", "shrinkalink")
+							? __("Shortlink deleted. A new one won't be created on save; add a short code below to create one.", "shrinkalink")
 							: __("No shortlink yet. One is created when the post is published.", "shrinkalink"),
 					),
 
@@ -236,7 +236,7 @@
 				el(
 					"p",
 					{ style: { fontSize: "12px", color: "#757575", marginTop: "-8px" } },
-					__("Manually deleted shortlinks won't be recreated on save. A new shortcode must be added manually.", "shrinkalink"),
+					__("Manually deleted shortlinks won't be recreated on save. A new short code must be added manually.", "shrinkalink"),
 				),
 				el(CheckboxControl, {
 					label: __("Also delete from Shlink", "shrinkalink"),
@@ -252,7 +252,7 @@
 
 			// drafts edit the requested code, saved with the post; otherwise the live code
 			el(TextControl, {
-				label: __("Shortlink shortcode", "shrinkalink"),
+				label: __("Short code", "shrinkalink"),
 				value: canCreate ? code : requested,
 				onChange: canCreate
 					? setCode
@@ -271,7 +271,7 @@
 								el("br"),
 								el("br"),
 								__(
-									"Check availability before using to prevent conflicts. If a conflict occurs, this field will be cleared and a random shortcode will be used on publish.",
+									"Check availability before using to prevent conflicts. If a conflict occurs, this field will be cleared and a random short code will be used on publish.",
 									"shrinkalink",
 								),
 							)),
@@ -291,7 +291,7 @@
 					el(CheckboxControl, {
 						label: __("Delete current link", "shrinkalink"),
 						help: __(
-							"Removes the current shortlink in addition to creating a new link with the updated shortcode.",
+							"Removes the current shortlink in addition to creating a new link with the updated short code.",
 							"shrinkalink",
 						),
 						checked: replace,

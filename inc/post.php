@@ -70,7 +70,7 @@ if ( ! class_exists( ShrinkALink_Post::class ) ) {
 
 
 		/**
-		 * Check whether a post is blocked from getting a short link automatically.
+		 * Check whether a post is blocked from getting a shortlink automatically.
 		 *
 		 * Stored as present or absent rather than true/false, since WordPress
 		 * saves false as '' and get_post_meta() returns '' for a missing key too.
@@ -107,7 +107,7 @@ if ( ! class_exists( ShrinkALink_Post::class ) ) {
 		 */
 		public static function save_link( $post_id, array $data ) {
 
-			// the short link's domain (Shlink returns null for its default domain, so read it from the URL)
+			// the shortlink's domain (Shlink returns null for its default domain, so read it from the URL)
 			$domain = wp_parse_url( $data['shortUrl'], PHP_URL_HOST );
 
 			// get my short URL
@@ -125,7 +125,7 @@ if ( ! class_exists( ShrinkALink_Post::class ) ) {
 		}
 
 		/**
-		 * Create a short link for a post and store it.
+		 * Create a shortlink for a post and store it.
 		 *
 		 * Sends the post's permalink and raw title (get_the_title adds HTML
 		 * entities). Doesn't check for an existing link or a block; callers
@@ -137,11 +137,12 @@ if ( ! class_exists( ShrinkALink_Post::class ) ) {
 		 */
 		public static function create_link( $post_id, array $args = array() ) {
 
-			$args = wp_parse_args( $args,
-			array(
-				'title' => sanitize_text_field( get_post_field( 'post_title', $post_id ) )
+			$args = wp_parse_args(
+				$args,
+				array(
+					'title' => sanitize_text_field( get_post_field( 'post_title', $post_id ) ),
 				)
-				);
+			);
 
 			$data = ShrinkALink_API::generate_shlink( get_permalink( $post_id ), $args );
 
@@ -154,9 +155,8 @@ if ( ! class_exists( ShrinkALink_Post::class ) ) {
 			// any requested code has been used, or replaced by whatever this link got
 			delete_post_meta( $post_id, self::META_REQUESTED );
 
-
 			/**
-			 * Fires after a short link is created and stored on a post.
+			 * Fires after a shortlink is created and stored on a post.
 			 *
 			 * @param int    $post_id  The post ID.
 			 * @param string $shorturl The stored short URL.
@@ -168,7 +168,7 @@ if ( ! class_exists( ShrinkALink_Post::class ) ) {
 
 
 		/**
-		 * Remove a post's short link, and block a new one being created automatically.
+		 * Remove a post's shortlink, and block a new one being created automatically.
 		 *
 		 * Only clears the post meta; deleting the link from Shlink is up to the caller.
 		 *
