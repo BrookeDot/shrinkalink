@@ -73,6 +73,52 @@ Regenerate the translation template, `languages/shrinkalink.pot`, after changing
 composer makepot
 ```
 
+## Installing with Composer
+
+Shrinkalink is a `wordpress-plugin` Composer package, so a site that manages plugins with Composer can install it from this repository.
+
+1. Tag a release whose version matches the plugin header, then push the tag:
+
+   ```sh
+   git tag v0.1.1
+   git push origin v0.1.1
+   ```
+
+2. In the site's `composer.json`, add the repository, require the plugin, and set where plugins go:
+
+   ```json
+   {
+       "repositories": [
+           { "type": "vcs", "url": "git@gitlab.com:brookedot/shrinkalink.git" }
+       ],
+       "require": {
+           "brookedot/shrinkalink": "^0.1"
+       },
+       "config": {
+           "allow-plugins": {
+               "composer/installers": true
+           }
+       },
+       "extra": {
+           "installer-paths": {
+               "plugins/{$name}/": ["type:wordpress-plugin"]
+           }
+       }
+   }
+   ```
+
+   The `installer-paths` path is relative to `composer.json`. Use `plugins/{$name}/` when `composer.json` is in `wp-content`, or `wp-content/plugins/{$name}/` when it's in the site root. Without it, plugins go to `wp-content/plugins/` relative to `composer.json`, which ends up as `wp-content/wp-content/plugins/` when `composer.json` is already in `wp-content`.
+
+3. Install it, and run `composer update brookedot/shrinkalink` to pick up later releases:
+
+   ```sh
+   composer install
+   ```
+
+If the repository is private, the server needs access to it, through an SSH key or `composer config gitlab-token.gitlab.com <token>`.
+
+Don't do this on a site where `plugins/shrinkalink` is your working copy of this repository, since Composer would replace it.
+
 ## Releasing
 
 Files listed in `.distignore` are left out of the release, including the tests, Composer files, the coding standards config and this README.

@@ -7,7 +7,7 @@
  * Author URI:      https://broo.ke
  * Text Domain:     shrinkalink
  * Domain Path:     /languages
- * Version:         0.1.0
+ * Version:         0.1.1
  * Requires at least: 7.1
  * Requires PHP:    8.4
  * License:         GPLv3 or later
@@ -49,7 +49,7 @@ if ( ! defined( 'SHRINKALINK_DIR' ) ) {
 }
 
 if ( ! defined( 'SHRINKALINK_VER' ) ) {
-	define( 'SHRINKALINK_VER', '0.1.0' );
+	define( 'SHRINKALINK_VER', '0.1.1' );
 }
 
 /**
