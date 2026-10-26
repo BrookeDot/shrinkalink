@@ -1,0 +1,48 @@
+# Builds the dist branch: the plugin without anything listed in .distignore.
+# Runs on every push to main, including pushes from the GitLab mirror.
+# Install on a site with: git clone -b dist <this repo's GitHub URL> shrinkalink
+
+name: Build dist branch
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+# a newer push replaces a build still running
+concurrency:
+  group: build-dist
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check out the dist branch, or start it
+        run: |
+          if git fetch --depth=1 origin dist:dist; then
+            git worktree add "$RUNNER_TEMP/dist" dist
+          else
+            git worktree add --orphan -b dist "$RUNNER_TEMP/dist"
+          fi
+
+      - name: Copy the plugin files
+        # --delete removes files that were deleted from main; .git is in .distignore, so it's kept
+        run: rsync -a --delete --exclude-from=.distignore ./ "$RUNNER_TEMP/dist/"
+
+      - name: Commit and push
+        working-directory: ${{ runner.temp }}/dist
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to the plugin files."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Build from ${GITHUB_SHA::7}"
+          git push origin dist
