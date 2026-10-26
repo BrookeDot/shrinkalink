@@ -103,9 +103,9 @@ class ShrinkALink {
 
 		// Load our back end.
 		if ( is_admin() ) {
-			require_once SHRINKALINK_DIR . 'inc/admin/admin-settings.php';
 			require_once SHRINKALINK_DIR . 'inc/admin/admin-columns.php';
-
+			require_once SHRINKALINK_DIR . 'inc/admin/admin-metabox.php';
+			require_once SHRINKALINK_DIR . 'inc/admin/admin-settings.php';
 		}
 
 		// Load our front end.
@@ -117,6 +117,7 @@ class ShrinkALink {
 		if ( class_exists( 'WP_CLI' ) ) {
 			require_once SHRINKALINK_DIR . 'cli/shrinkalink.php';
 		}
+
 		require_once SHRINKALINK_DIR . 'inc/api.php';
 		require_once SHRINKALINK_DIR . 'inc/cron.php';
 		require_once SHRINKALINK_DIR . 'inc/publish.php';

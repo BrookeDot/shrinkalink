@@ -40,8 +40,79 @@ if ( ! class_exists( ShrinkALink_Publish::class ) ) {
 		 * Hook link creation into post saves.
 		 */
 		public function __construct() {
-			// add_action( 'save_post', array( $this, 'yourls_keyword' ) );
+			add_action( 'init', array( $this, 'register_requested_meta' ), 20 );
 			add_action( 'wp_after_insert_post', array( $this, 'add_shlink_on_save' ), 10, 4 );
+			add_action( 'added_post_meta', array( $this, 'clear_taken_request' ), 10, 4 );
+			add_action( 'updated_post_meta', array( $this, 'clear_taken_request' ), 10, 4 );
+		}
+
+		/**
+		 * Register the requested short code meta for every supported post type.
+		 *
+		 * Lets the editor panel save a custom code with a draft; add_shlink_on_save()
+		 * uses it when the post is published. Runs at priority 20 so custom post
+		 * types registered on init are included.
+		 *
+		 * @return void
+		 */
+		public function register_requested_meta() {
+
+			foreach ( ShrinkALink_Post::get_post_types() as $post_type ) {
+
+				// core REST only exposes meta for post types that support custom-fields
+				add_post_type_support( $post_type, 'custom-fields' );
+
+				register_post_meta(
+					$post_type,
+					ShrinkALink_Post::META_REQUESTED,
+					array(
+						'show_in_rest'      => true,
+						'single'            => true,
+						'type'              => 'string',
+						'default'           => '',
+						'sanitize_callback' => array( ShrinkALink_API::class, 'prepare_shortcode' ),
+						'auth_callback'     => array( $this, 'can_request_shortcode' ),
+					)
+				);
+			}
+		}
+
+		/**
+		 * Only users who may change a post's short link can request a code for it.
+		 *
+		 * Uses the same shrinkalink_edit_cap filter as the REST routes.
+		 *
+		 * @param  bool   $allowed  Whether the user can edit the meta key. Unused.
+		 * @param  string $meta_key The meta key. Unused.
+		 * @param  int    $post_id  The post ID.
+		 * @return bool
+		 */
+		public function can_request_shortcode( $allowed, $meta_key, $post_id ) {
+			return current_user_can( apply_filters( 'shrinkalink_edit_cap', 'edit_post', $post_id ), $post_id );
+		}
+
+		/**
+		 * Clear a requested short code that's already in use on Shlink.
+		 *
+		 * Runs only when the request is added or changed, so Shlink is asked once
+		 * per new code rather than on every save. If Shlink can't be reached the
+		 * request is kept, and publishing falls back to a random code if needed.
+		 *
+		 * @param  int    $meta_id    The meta row ID. Unused.
+		 * @param  int    $post_id    The post ID.
+		 * @param  string $meta_key   The meta key.
+		 * @param  mixed  $meta_value The new value, already cleaned by prepare_shortcode().
+		 * @return void
+		 */
+		public function clear_taken_request( $meta_id, $post_id, $meta_key, $meta_value ) {
+
+			if ( ShrinkALink_Post::META_REQUESTED !== $meta_key || '' === (string) $meta_value ) {
+				return;
+			}
+
+			if ( false === ShrinkALink_Post::is_shortcode_available( $post_id, $meta_value ) ) {
+				delete_post_meta( $post_id, ShrinkALink_Post::META_REQUESTED );
+			}
 		}
 
 		/**
@@ -95,6 +166,11 @@ if ( ! class_exists( ShrinkALink_Publish::class ) ) {
 				return;
 			}
 
+			// bail if the post is blocked from getting a shortlink automatically
+			if ( ShrinkALink_Post::is_blocked( $post_id ) ) {
+				return;
+			}
+
 			// scheduled posts going live can be turned off separately
 			if ( $post_before && 'future' === $post_before->post_status
 				&& false === apply_filters( 'shrinkalink_create_on_schedule', true, $post_id, $post )
@@ -106,37 +182,17 @@ if ( ! class_exists( ShrinkALink_Publish::class ) ) {
 			if ( false !== ShrinkALink_Post::get_post_meta( $post_id ) ) {
 				return;
 			}
-
-			// get my post URL and raw title (get_the_title adds HTML entities)
-			$url   = get_permalink( $post_id );
-			$title = get_post_field( 'post_title', $post_id );
-
-			// and optional short code, unslashed since WordPress slashes $_POST (generate_shlink cleans it)
-			$shortcode = ! empty( $_POST['shrinkalink-shortcode'] ) ? trim( wp_unslash( $_POST['shrinkalink-shortcode'] ) ) : '';
-
-			// set my args for the API call (longUrl is set by generate_shlink)
-			$args = array(
-				'title' => sanitize_text_field( $title ),
-			);
+			// a custom code requested in the editor panel, already cleaned by prepare_shortcode()
+			$requested = ShrinkALink_Post::get_post_meta( $post_id, ShrinkALink_Post::META_REQUESTED, '' );
 
 			// only send a slug when one was requested, otherwise Shlink generates one
-			if ( '' !== $shortcode ) {
-				$args['customSlug'] = $shortcode;
+			$args   = '' !== $requested ? array( 'customSlug' => $requested ) : array();
+			$result = ShrinkALink_Post::create_link( $post_id, $args );
+
+			// a taken or invalid code shouldn't leave the post without a link, so fall back to a random one
+			if ( is_wp_error( $result ) && '' !== $requested ) {
+				ShrinkALink_Post::create_link( $post_id );
 			}
-
-			// make the API call
-			$build = ShrinkALink_API::generate_shlink( $url, $args );
-
-			// bail if an error was received
-			if ( is_wp_error( $build ) ) {
-				return;
-			}
-
-			// store the short URL, code and domain on the post
-			$shorturl = ShrinkALink_Post::save_link( $post_id, $build );
-
-			// do the action after saving
-			do_action( 'shrinkalink_after_url_save', $post_id, $shorturl );
 		}
 
 		/**
