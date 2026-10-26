@@ -43,6 +43,8 @@ if ( ! class_exists( ShrinkALink_Post::class ) ) {
 		const META_SHORTCODE = '_shrinkalink_shortcode';
 		const META_DOMAIN    = '_shrinkalink_domain';
 		const META_CLICKS    = '_shrinkalink_clicks';
+		const META_BLOCKED   = '_shrinkalink_blocked';
+		const META_REQUESTED = '_shrinkalink_requested';
 
 		/**
 		 * Get a Shrinkalink post meta value.
@@ -65,6 +67,36 @@ if ( ! class_exists( ShrinkALink_Post::class ) ) {
 			// return either empty or fallback
 			return isset( $fallback ) ? $fallback : false;
 		}
+
+
+		/**
+		 * Check whether a post is blocked from getting a short link automatically.
+		 *
+		 * Stored as present or absent rather than true/false, since WordPress
+		 * saves false as '' and get_post_meta() returns '' for a missing key too.
+		 *
+		 * @param  int $post_id The post ID.
+		 * @return bool
+		 */
+		public static function is_blocked( $post_id ) {
+			return metadata_exists( 'post', $post_id, self::META_BLOCKED );
+		}
+
+		/**
+		 * Block or unblock a post from getting a shortlink automatically.
+		 *
+		 * @param  int  $post_id The post ID.
+		 * @param  bool $blocked True to block, false to unblock. Default true.
+		 * @return void
+		 */
+		public static function set_blocked( $post_id, $blocked = true ) {
+			if ( $blocked ) {
+				update_post_meta( $post_id, self::META_BLOCKED, 1 );
+			} else {
+				delete_post_meta( $post_id, self::META_BLOCKED );
+			}
+		}
+
 
 		/**
 		 * Store a short URL's details on a post.
@@ -90,6 +122,99 @@ if ( ! class_exists( ShrinkALink_Post::class ) ) {
 			add_post_meta( $post_id, self::META_CLICKS, 0, true );
 
 			return $shorturl;
+		}
+
+		/**
+		 * Create a short link for a post and store it.
+		 *
+		 * Sends the post's permalink and raw title (get_the_title adds HTML
+		 * entities). Doesn't check for an existing link or a block; callers
+		 * decide that. A successful create unblocks the post.
+		 *
+		 * @param  int   $post_id The post ID.
+		 * @param  array $args    Optional Shlink fields, e.g. customSlug or findIfExists.
+		 * @return string|WP_Error The stored short URL, or an error.
+		 */
+		public static function create_link( $post_id, array $args = array() ) {
+
+			$args = wp_parse_args( $args,
+			array(
+				'title' => sanitize_text_field( get_post_field( 'post_title', $post_id ) )
+				)
+				);
+
+			$data = ShrinkALink_API::generate_shlink( get_permalink( $post_id ), $args );
+
+			if ( is_wp_error( $data ) ) {
+				return $data;
+			}
+			$shorturl = self::save_link( $post_id, $data );
+			self::set_blocked( $post_id, false );
+
+			// any requested code has been used, or replaced by whatever this link got
+			delete_post_meta( $post_id, self::META_REQUESTED );
+
+
+			/**
+			 * Fires after a short link is created and stored on a post.
+			 *
+			 * @param int    $post_id  The post ID.
+			 * @param string $shorturl The stored short URL.
+			 */
+			do_action( 'shrinkalink_after_url_save', $post_id, $shorturl );
+
+			return $shorturl;
+		}
+
+
+		/**
+		 * Remove a post's short link, and block a new one being created automatically.
+		 *
+		 * Only clears the post meta; deleting the link from Shlink is up to the caller.
+		 *
+		 * @param  int $post_id The post ID.
+		 * @return void
+		 */
+		public static function remove_link( $post_id ) {
+
+			foreach ( array( self::META_URL, self::META_SHORTCODE, self::META_DOMAIN, self::META_CLICKS ) as $key ) {
+				delete_post_meta( $post_id, $key );
+			}
+
+			self::set_blocked( $post_id );
+		}
+
+		/**
+		 * Check whether a short code is free on Shlink for this post.
+		 *
+		 * The post's own current code counts as available. Expects a code already
+		 * cleaned by ShrinkALink_API::prepare_shortcode().
+		 *
+		 * @param  int    $post_id   The post ID.
+		 * @param  string $shortcode The cleaned short code.
+		 * @return bool|WP_Error     True if free, false if taken, or an error if Shlink couldn't be asked.
+		 */
+		public static function is_shortcode_available( $post_id, $shortcode ) {
+
+			// the post's own code isn't taken by someone else
+			if ( self::get_post_meta( $post_id, self::META_SHORTCODE ) === $shortcode ) {
+				return true;
+			}
+
+			$data = ShrinkALink_API::get_shlink( $shortcode );
+
+			if ( ! is_wp_error( $data ) ) {
+				return false;
+			}
+
+			// Shlink answers 404 for unused short codes
+			$details = $data->get_error_data();
+
+			if ( is_array( $details ) && 404 === (int) ( $details['status'] ?? 0 ) ) {
+				return true;
+			}
+
+			return $data;
 		}
 
 		/**

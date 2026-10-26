@@ -384,6 +384,94 @@ if ( ! class_exists( ShrinkALink_Commands::class ) ) {
 		}
 
 		/**
+		 * Replace a post's shortlink with a new one.
+		 *
+		 * Shlink can't rename a short code, so this creates a new link and stores
+		 * it on the post. The old link keeps working unless --delete is passed.
+		 * A post without a shortlink just gets one.
+		 *
+		 * ## OPTIONS
+		 *
+		 * <post_id>
+		 * : The post to update.
+		 *
+		 * [--slug=<slug>]
+		 * : A custom short code for the new link. Shlink generates one when omitted.
+		 *
+		 * [--delete]
+		 * : Delete the old link from Shlink once the new one is saved.
+		 *
+		 * [--yes]
+		 * : Skip the confirmation prompt for --delete.
+		 *
+		 * ## EXAMPLES
+		 *
+		 *     wp shrinkalink update-url 123 --slug=hello
+		 *     wp shrinkalink update-url 123 --slug=hello --delete --yes
+		 *
+		 * @subcommand update-url
+		 */
+		public function update_url( $args, $assoc_args ) {
+
+			$post_id = absint( $args[0] );
+
+			if ( ! get_post( $post_id ) ) {
+				WP_CLI::error( "Post #{$post_id} not found." );
+			}
+
+			if ( ! in_array( get_post_type( $post_id ), ShrinkALink_Post::get_post_types(), true )
+				|| ! in_array( get_post_status( $post_id ), ShrinkALink_Post::get_statuses(), true )
+			) {
+				WP_CLI::error( 'Shortlinks can only be created for published or scheduled posts of a supported type.' );
+			}
+
+			$current = ShrinkALink_Post::get_post_meta( $post_id, ShrinkALink_Post::META_SHORTCODE );
+			$domain  = ShrinkALink_Post::get_post_meta( $post_id, ShrinkALink_Post::META_DOMAIN, '' );
+			$slug    = trim( (string) ( $assoc_args['slug'] ?? '' ) );
+			$delete  = \WP_CLI\Utils\get_flag_value( $assoc_args, 'delete', false );
+
+			if ( false !== $current && $slug === $current ) {
+				WP_CLI::error( "Post #{$post_id} already uses the short code \"{$current}\"." );
+			}
+
+			// generate_shlink() cleans the slug and errors if nothing is left
+			$request = '' !== $slug ? array( 'customSlug' => $slug ) : array();
+
+			// without a slug, Shlink would hand back the existing link for the same long URL
+			if ( false !== $current && '' === $slug ) {
+				$request['findIfExists'] = false;
+			}
+
+			// deleting can't be undone, so ask before changing anything
+			if ( false !== $current && $delete ) {
+				WP_CLI::confirm( "Delete the current short URL \"{$current}\" from Shlink once the new one is saved? This cannot be undone.", $assoc_args );
+			}
+
+			$shorturl = ShrinkALink_Post::create_link( $post_id, $request );
+
+			if ( is_wp_error( $shorturl ) ) {
+				WP_CLI::error( $shorturl->get_error_message() );
+			}
+
+			WP_CLI::log( "#{$post_id} " . get_the_title( $post_id ) . " → {$shorturl}" );
+
+			// only delete once the new link is saved, and never the link Shlink just returned
+			$new_code = ShrinkALink_Post::get_post_meta( $post_id, ShrinkALink_Post::META_SHORTCODE );
+
+			if ( false !== $current && $delete && $current !== $new_code ) {
+				$deleted = ShrinkALink_API::delete_shlink( $current, array( 'domain' => $domain ) );
+
+				if ( is_wp_error( $deleted ) ) {
+					WP_CLI::warning( "The new link is saved, but \"{$current}\" could not be deleted: " . $deleted->get_error_message() );
+				} else {
+					WP_CLI::log( "Deleted short URL \"{$current}\"." );
+				}
+			}
+
+			WP_CLI::success( "Short URL: {$shorturl}" );
+		}
+
+		/**
 		 * Split a short code or full short URL into the code and API args
 		 *
 		 * @param  string $input A short code like 'abc123', or a URL like 'https://example.com/abc123'.
@@ -492,7 +580,9 @@ if ( ! class_exists( ShrinkALink_Commands::class ) ) {
 		 * Create shortlinks for published posts that don't have one.
 		 *
 		 * For posts published before Shrinkalink, or saved in ways the old
-		 * plugin missed (such as the block editor).
+		 * plugin missed (such as the block editor). Skips posts whose link was
+		 * deleted on purpose; update-url creates one for those and unblocks them.
+
 		 *
 		 * ## OPTIONS
 		 *
@@ -542,6 +632,10 @@ if ( ! class_exists( ShrinkALink_Commands::class ) ) {
 									'key'     => ShrinkALink_Post::META_URL,
 									'compare' => 'NOT EXISTS',
 								),
+								array(
+							'key'     => ShrinkALink_Post::META_BLOCKED,
+							'compare' => 'NOT EXISTS',
+						),
 					),
 				)
 			);
